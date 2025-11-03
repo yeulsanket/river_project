@@ -1,7 +1,7 @@
 /**
  * River Revive - Community Engagement Program
  * Enhanced JavaScript with error handling, analytics, and UX improvements
- * @version 2.0
+ * @version 2.1
  */
 
 // ===========================
@@ -21,12 +21,20 @@ const CONFIG = {
     instagram: "https://www.instagram.com/riverrevive/",
     facebook: "https://www.facebook.com/share/1K8sMSbfWQ/",
     whatsappChannel: "https://chat.whatsapp.com/GNSfS7d4hxWEzAUlZtHUwr?mode=ems_wa_t",
-    officialPortal: "https://puneriverrevival.com"
+    officialPortal: "https://puneriverrevival.com",
+    government: {
+      swabhavSwachhata: "https://share.google/0QBSi7Yo1evoMs7Vc",
+      swachhBharatMission: "https://share.google/GA1AYB0WM3TCuHJRd",
+      swachhBharatMyGov: "https://share.google/s3GcHMqhw7lCmRPof"
+    }
   },
   messages: {
     contactGreeting: "Hello River Revive team! I want to participate in the river cleaning camp.",
     shareEmoji: "🌊",
-    errorMessage: "Unable to open WhatsApp. Please try again."
+    errorMessage: "Unable to open WhatsApp. Please try again.",
+    successShare: "Opening WhatsApp...",
+    successContact: "Opening WhatsApp contact...",
+    popupBlocked: "Popup blocked. Please allow popups for this site."
   }
 };
 
@@ -54,10 +62,9 @@ function isMobileDevice() {
 /**
  * Show temporary feedback to user
  * @param {string} message - Message to display
- * @param {string} type - Type of message (success/error)
+ * @param {string} type - Type of message (success/error/info)
  */
 function showFeedback(message, type = 'success') {
-  // Check if feedback element exists, create if not
   let feedback = document.getElementById('feedback-toast');
   
   if (!feedback) {
@@ -73,28 +80,30 @@ function showFeedback(message, type = 'success') {
       font-size: 14px;
       z-index: 1000;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.3s ease, transform 0.3s ease;
       pointer-events: none;
       max-width: 300px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transform: translateY(-10px);
     `;
     document.body.appendChild(feedback);
   }
 
-  // Set colors based on type
   const colors = {
     success: { bg: '#35b9a6', text: '#fff' },
-    error: { bg: '#ef4444', text: '#fff' }
+    error: { bg: '#ef4444', text: '#fff' },
+    info: { bg: '#2d7df6', text: '#fff' }
   };
 
   feedback.style.backgroundColor = colors[type].bg;
   feedback.style.color = colors[type].text;
   feedback.textContent = message;
   feedback.style.opacity = '1';
+  feedback.style.transform = 'translateY(0)';
 
-  // Hide after 3 seconds
   setTimeout(() => {
     feedback.style.opacity = '0';
+    feedback.style.transform = 'translateY(-10px)';
   }, 3000);
 }
 
@@ -123,6 +132,9 @@ function buildShareMessage() {
       `Facebook: ${CONFIG.links.facebook}`,
       `WhatsApp: ${CONFIG.links.whatsappChannel}`,
       "",
+      "🇮🇳 Supported by:",
+      "Swachh Bharat Mission & Government Initiatives",
+      "",
       "Let's make a difference together! 💚"
     ];
     
@@ -141,7 +153,6 @@ function buildShareMessage() {
 function createWhatsAppShareURL(text) {
   try {
     const encodedText = encodeURIComponent(text);
-    // Use api.whatsapp.com for better mobile support
     const baseURL = isMobileDevice() ? 'https://api.whatsapp.com/send' : 'https://web.whatsapp.com/send';
     return `${baseURL}?text=${encodedText}`;
   } catch (error) {
@@ -176,15 +187,14 @@ function openURL(url, context = 'link') {
   try {
     const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
     
-    // Check if popup was blocked
     if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      showFeedback('Popup blocked. Please allow popups for this site.', 'error');
-      // Fallback: try direct navigation
+      showFeedback(CONFIG.messages.popupBlocked, 'error');
       setTimeout(() => {
         window.location.href = url;
       }, 1000);
     } else {
-      showFeedback('Opening WhatsApp...', 'success');
+      const message = context === 'share' ? CONFIG.messages.successShare : CONFIG.messages.successContact;
+      showFeedback(message, 'success');
     }
   } catch (error) {
     logError(`openURL (${context})`, error);
@@ -207,8 +217,6 @@ function handleShareClick(event) {
     const shareText = buildShareMessage();
     const shareURL = createWhatsAppShareURL(shareText);
     openURL(shareURL, 'share');
-    
-    // Track share action (can be replaced with actual analytics)
     trackEvent('share', 'whatsapp', 'event_details');
   } catch (error) {
     logError('handleShareClick', error);
@@ -229,12 +237,24 @@ function handleContactClick(event) {
       CONFIG.messages.contactGreeting
     );
     openURL(contactURL, 'contact');
-    
-    // Track contact action
     trackEvent('contact', 'whatsapp', 'direct_message');
   } catch (error) {
     logError('handleContactClick', error);
     showFeedback(CONFIG.messages.errorMessage, 'error');
+  }
+}
+
+/**
+ * Handle government link clicks
+ * @param {Event} event - Click event
+ * @param {string} linkName - Name of the government link
+ */
+function handleGovLinkClick(event, linkName) {
+  try {
+    trackEvent('click', 'government_link', linkName);
+    showFeedback(`Opening ${linkName}...`, 'info');
+  } catch (error) {
+    logError('handleGovLinkClick', error);
   }
 }
 
@@ -245,8 +265,6 @@ function handleContactClick(event) {
  * @param {string} label - Event label
  */
 function trackEvent(action, category, label) {
-  // Placeholder for analytics tracking
-  // Replace with Google Analytics, Mixpanel, etc.
   if (window.gtag) {
     window.gtag('event', action, {
       event_category: category,
@@ -254,7 +272,6 @@ function trackEvent(action, category, label) {
     });
   }
   
-  // Log for debugging
   console.log(`[Analytics] ${category} - ${action} - ${label}`);
 }
 
@@ -283,6 +300,8 @@ function initSmoothScroll() {
             top: offsetPosition,
             behavior: 'smooth'
           });
+          
+          trackEvent('navigation', 'smooth_scroll', targetId);
         }
       }
     });
@@ -301,8 +320,9 @@ function initHeaderScroll() {
   if (!header) return;
 
   let lastScroll = 0;
-  
-  window.addEventListener('scroll', () => {
+  let ticking = false;
+
+  function updateHeader() {
     const currentScroll = window.pageYOffset;
     
     if (currentScroll > 50) {
@@ -314,6 +334,46 @@ function initHeaderScroll() {
     }
     
     lastScroll = currentScroll;
+    ticking = false;
+  }
+  
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateHeader);
+      ticking = true;
+    }
+  });
+}
+
+// ===========================
+// Scroll Reveal Animation
+// ===========================
+
+/**
+ * Add scroll reveal animations for elements
+ */
+function initScrollReveal() {
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  const elementsToAnimate = document.querySelectorAll('.card, .gov-card, .faq, .fallback');
+  elementsToAnimate.forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
   });
 }
 
@@ -326,28 +386,102 @@ function initHeaderScroll() {
  */
 function initKeyboardNavigation() {
   document.addEventListener('keydown', (e) => {
-    // Handle Escape key to close any modals/overlays
     if (e.key === 'Escape') {
       const feedback = document.getElementById('feedback-toast');
       if (feedback) {
         feedback.style.opacity = '0';
+        feedback.style.transform = 'translateY(-10px)';
       }
     }
+  });
+
+  // Add skip to content link
+  const skipLink = document.createElement('a');
+  skipLink.href = '#participate';
+  skipLink.textContent = 'Skip to main content';
+  skipLink.className = 'skip-link';
+  skipLink.style.cssText = `
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--brand-2);
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 100;
+    border-radius: 0 0 8px 0;
+  `;
+  skipLink.addEventListener('focus', () => {
+    skipLink.style.top = '0';
+  });
+  skipLink.addEventListener('blur', () => {
+    skipLink.style.top = '-40px';
+  });
+  document.body.insertBefore(skipLink, document.body.firstChild);
+}
+
+// ===========================
+// Link Tracking
+// ===========================
+
+/**
+ * Track all external link clicks
+ */
+function initLinkTracking() {
+  document.querySelectorAll('a[target="_blank"]').forEach(link => {
+    link.addEventListener('click', function() {
+      const url = this.href;
+      const label = this.textContent || this.getAttribute('aria-label') || url;
+      trackEvent('click', 'external_link', label);
+    });
   });
 }
 
 // ===========================
-// Form Validation (if forms are added)
+// Government Links Enhancement
 // ===========================
 
 /**
- * Validate phone number format
- * @param {string} phone - Phone number to validate
- * @returns {boolean}
+ * Add tracking and feedback to government links
  */
-function isValidPhoneNumber(phone) {
-  const cleanPhone = phone.replace(/\D/g, '');
-  return cleanPhone.length >= 10 && cleanPhone.length <= 15;
+function initGovLinks() {
+  const govCards = document.querySelectorAll('.gov-card');
+  
+  govCards.forEach((card, index) => {
+    const linkNames = ['SwabhavSwachhata', 'Swachh Bharat Mission', 'Swachh Bharat MyGov'];
+    
+    card.addEventListener('click', function(e) {
+      handleGovLinkClick(e, linkNames[index]);
+    });
+
+    // Add keyboard support
+    card.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.click();
+      }
+    });
+  });
+}
+
+// ===========================
+// Performance Monitoring
+// ===========================
+
+/**
+ * Log page load performance
+ */
+function logPerformance() {
+  if (window.performance && window.performance.timing) {
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const perfData = window.performance.timing;
+        const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+        console.log(`[Performance] Page loaded in ${pageLoadTime}ms`);
+        trackEvent('performance', 'page_load', `${pageLoadTime}ms`);
+      }, 0);
+    });
+  }
 }
 
 // ===========================
@@ -381,10 +515,14 @@ function init() {
     // Initialize enhancements
     initSmoothScroll();
     initHeaderScroll();
+    initScrollReveal();
     initKeyboardNavigation();
+    initLinkTracking();
+    initGovLinks();
+    logPerformance();
 
-    // Log successful initialization
-    console.log('[River Revive] Initialized successfully ✓');
+    console.log('[River Revive] ✓ Initialized successfully');
+    console.log('[River Revive] Version 2.1');
     
   } catch (error) {
     logError('init', error);
@@ -395,21 +533,29 @@ function init() {
 // Event Listeners
 // ===========================
 
-// Wait for DOM to be fully loaded
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
-  // DOM is already loaded
   init();
 }
 
-// Handle page visibility changes (for analytics)
+// Handle page visibility changes
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    console.log('[River Revive] Page hidden');
-  } else {
+  if (!document.hidden) {
     console.log('[River Revive] Page visible');
+    trackEvent('page', 'visibility', 'visible');
   }
+});
+
+// Handle online/offline status
+window.addEventListener('online', () => {
+  showFeedback('You are back online', 'success');
+  trackEvent('connection', 'status', 'online');
+});
+
+window.addEventListener('offline', () => {
+  showFeedback('You are offline. Some features may not work.', 'error');
+  trackEvent('connection', 'status', 'offline');
 });
 
 // ===========================
@@ -420,7 +566,6 @@ if (typeof module !== 'undefined' && module.exports) {
     buildShareMessage,
     createWhatsAppShareURL,
     createWhatsAppContactURL,
-    isValidPhoneNumber,
     CONFIG
   };
 }
