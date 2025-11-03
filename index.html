@@ -4,13 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>River Revive - Community Engagement Program</title>
-  <meta name="description" content="Join the River Revive community program for river cleaning in Pune. Event at Bhide Bridge on 14 Oct 2025, 9:00 AM. Up to 1000 participants.">
+  <meta name="description" content="Join the River Revive community program for river cleaning in Pune. Event at Bhide Bridge on 14 November 2025, 9:00 AM. Up to 100 participants." />
+  <meta name="theme-color" content="#0e1116" />
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Header -->
   <header class="site-header">
     <div class="container header-inner">
       <div class="brand">
@@ -20,29 +26,33 @@
           <p class="site-tagline">Community Engagement Program</p>
         </div>
       </div>
-      <nav class="social">
-        <a class="social-link ig" href="https://www.instagram.com/riverrevive/" target="_blank" rel="noopener">Instagram</a>
-        <a class="social-link fb" href="https://www.facebook.com/share/1K8sMSbfWQ/" target="_blank" rel="noopener">Facebook</a>
-        <a class="social-link wa" href="https://chat.whatsapp.com/GNSfS7d4hxWEzAUlZtHUwr?mode=ems_wa_t" target="_blank" rel="noopener">WhatsApp</a>
+      <nav class="social" aria-label="Social media links">
+        <a class="social-link ig" href="https://www.instagram.com/riverrevive/" target="_blank" rel="noopener" aria-label="Follow us on Instagram">Instagram</a>
+        <a class="social-link fb" href="https://www.facebook.com/share/1K8sMSbfWQ/" target="_blank" rel="noopener" aria-label="Follow us on Facebook">Facebook</a>
+        <a class="social-link wa" href="https://chat.whatsapp.com/GNSfS7d4hxWEzAUlZtHUwr?mode=ems_wa_t" target="_blank" rel="noopener" aria-label="Join WhatsApp Channel">WhatsApp</a>
       </nav>
     </div>
   </header>
 
+  <!-- Main Content -->
   <main>
+    <!-- Hero Section -->
     <section class="hero">
       <div class="container hero-inner">
-        <h2 class="hero-title">Let’s revive our river — together</h2>
+        <h2 class="hero-title">Let's revive our river — together</h2>
         <p class="hero-subtitle">Join the Pune river cleaning camp and make a visible impact in just a few hours.</p>
         <div class="cta-row">
           <a class="btn primary" href="#participate">Participate now</a>
-          <a id="share-whatsapp" class="btn outline" href="#">Share on WhatsApp</a>
+          <button id="share-whatsapp" class="btn outline">Share on WhatsApp</button>
         </div>
       </div>
     </section>
 
+    <!-- Event Details Section -->
     <section class="event" id="participate">
       <div class="container event-grid">
-        <div class="card">
+        <!-- Event Details Card -->
+        <article class="card">
           <h3>Event details</h3>
           <ul class="kv">
             <li><span>Date</span><span>14 November 2025</span></li>
@@ -50,9 +60,13 @@
             <li><span>Location</span><span>Bhide Bridge, Pune</span></li>
             <li><span>Capacity</span><span>Up to 100 participants</span></li>
           </ul>
-          <a class="btn block" href="https://maps.google.com/?q=Bhide+Bridge+Pune" target="_blank" rel="noopener">Open in Maps</a>
-        </div>
-        <div class="card">
+          <a class="btn block" href="https://maps.google.com/?q=Bhide+Bridge+Pune" target="_blank" rel="noopener">
+            <span>📍</span> Open in Maps
+          </a>
+        </article>
+
+        <!-- Connect Card -->
+        <article class="card">
           <h3>Connect with us</h3>
           <p>Follow updates, join the community, and spread the word.</p>
           <div class="social-cards">
@@ -62,13 +76,14 @@
           </div>
           <div class="contact">
             <h4>Contact</h4>
-            <a class="phone" href="tel:‪+918412011008‬">‪+91 84120 11008‬</a>
-            <a class="btn ghost" id="whatsapp-contact" href="#">Message on WhatsApp</a>
+            <a class="phone" href="tel:+918412011008">+91 84120 11008</a>
+            <button class="btn ghost" id="whatsapp-contact">Message on WhatsApp</button>
           </div>
-        </div>
+        </article>
       </div>
     </section>
 
+    <!-- FAQ Section -->
     <section class="faq">
       <div class="container">
         <h3>What to bring</h3>
@@ -79,12 +94,23 @@
         </ul>
       </div>
     </section>
+
+    <!-- Fallback Section -->
+    <section class="fallback">
+      <div class="container">
+        <h3>If channel links aren't working</h3>
+        <p>You can always visit our official event portal to sign up or learn more about the River Revive Community Program:</p>
+        <a class="btn primary" href="https://puneriverrevival.com" target="_blank" rel="noopener">Visit Official Portal</a>
+        <p>For urgent queries, call <a href="tel:+918412011008">+91 84120 11008</a>.</p>
+      </div>
+    </section>
   </main>
 
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-inner">
       <p>© 2025 River Revive · Pune</p>
-      <nav class="social">
+      <nav class="social" aria-label="Footer social media links">
         <a class="social-link ig" href="https://www.instagram.com/riverrevive/" target="_blank" rel="noopener">Instagram</a>
         <a class="social-link fb" href="https://www.facebook.com/share/1K8sMSbfWQ/" target="_blank" rel="noopener">Facebook</a>
         <a class="social-link wa" href="https://chat.whatsapp.com/GNSfS7d4hxWEzAUlZtHUwr?mode=ems_wa_t" target="_blank" rel="noopener">WhatsApp</a>
@@ -92,6 +118,7 @@
     </div>
   </footer>
 
+  <!-- Scripts -->
   <script src="script.js"></script>
 </body>
 </html>
